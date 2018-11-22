@@ -62,8 +62,18 @@ export class BlogService {
 
   updatePost(username: string, post: Post): void{
     let PutUrl = this.ApiUrl.concat(username).concat('/').concat(post.postid.toString());
-    this.http.put(PutUrl, post, httpOptions)
+    this.http.put(PutUrl, post, httpOptions);
+    this.posts.find(p=>p.postid==post.postid).title = post.title
+    this.posts.find(p=>p.postid==post.postid).body = post.body
+    this.posts.find(p=>p.postid==post.postid).modified = new Date((new Date()).getTime() + 24*60*60*1000);
     //TODO: Check 200
+  }
+
+  deletePost(username: string, postid: number): void {
+    let DeleteUrl = this.ApiUrl.concat(username).concat('/').concat(postid.toString());
+    this.http.delete(DeleteUrl, httpOptions);
+    this.posts = this.posts.filter(p => p.postid !== postid);
+    //TODO: Check 204
   }
 }
 
