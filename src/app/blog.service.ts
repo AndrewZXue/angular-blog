@@ -10,11 +10,15 @@ const httpOptions = {
 })
 export class BlogService {
 
-  constructor(
-    private http: HttpClient
-  ) { }
+  private username: string;
   private posts: Post[];
   private ApiUrl = 'http://localhost:3000/api/';
+
+  constructor(
+    private http: HttpClient
+  ) { 
+    this.fetchPosts(this.username);
+  }
 
   fetchPosts(username: string): void{
     let GetUrl = this.ApiUrl.concat(username);
@@ -24,18 +28,16 @@ export class BlogService {
     //TODO: Check 404
   }
 
-  getPosts(username: string): Post[]{
-    this.fetchPosts(username);
+  getPosts(): Post[]{
     return this.posts;
   }
 
-  getPost(username: string, id: number): Post{
-    this.fetchPosts(username);
+  getPost(id: number): Post{
     let ret_post = this.posts.find( ret_post => ret_post.postid == id);
     return ret_post;
   }
 
-  getId(username: string): number{
+  getId(): number{
     var max_id = 0;
     for(let post of this.posts){
       if(post.postid > max_id) max_id = post.postid + 1;
@@ -43,16 +45,15 @@ export class BlogService {
     return max_id;
   }
 
-  newPost(username: string): Post{
-    this.fetchPosts(username);
+  newPost(): Post{
     var new_post = new Post();
-    new_post.postid = this.getId(username);
+    new_post.postid = this.getId();
     new_post.created = new Date((new Date()).getTime() + 24*60*60*1000);
     new_post.modified = new Date((new Date()).getTime() + 24*60*60*1000);
     new_post.title = "";
     new_post.body = "";
 
-    let PostUrl = this.ApiUrl.concat(username).concat('/').concat(new_post.postid.toString());
+    let PostUrl = this.ApiUrl.concat(this.username).concat('/').concat(new_post.postid.toString());
 
     this.posts.push(new_post);
     this.http.post<Post>(PostUrl, new_post, httpOptions);
