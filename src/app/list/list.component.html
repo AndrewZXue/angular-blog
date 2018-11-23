@@ -11,7 +11,7 @@
     <ul>
       <li *ngFor="let post of posts">
         <a routerLink="/edit/{{post.postid}}">
-           <span>{{post.created | date:'m/d/yy, h:mm:ss a'}}</span> <span>{{post.title}}</span>
+          <span class="badge"><i class="fa fa-clock-o" aria-hidden="true"></i> {{post.created | date:'M/d/yy, h:mm:ss a'}}</span> <span class="tit">{{post.title}}</span>
         </a>
       </li>
     </ul>

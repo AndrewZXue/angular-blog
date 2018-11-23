@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { POSTS } from './mock-posts';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -32,6 +34,10 @@ export class BlogService {
     return this.posts;
   }
 
+  getPosts_mock(): Observable<Post[]>{
+    return of(POSTS);
+  }
+
   getPost(id: number): Post{
     let ret_post = this.posts.find( ret_post => ret_post.postid == id);
     return ret_post;
@@ -48,8 +54,8 @@ export class BlogService {
   newPost(): Post{
     var new_post = new Post();
     new_post.postid = this.getId();
-    new_post.created = new Date((new Date()).getTime() + 24*60*60*1000);
-    new_post.modified = new Date((new Date()).getTime() + 24*60*60*1000);
+    new_post.created = new Date((new Date()));
+    new_post.modified = new Date((new Date()));
     new_post.title = "";
     new_post.body = "";
 

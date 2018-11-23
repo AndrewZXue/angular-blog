@@ -12,9 +12,13 @@ export class ListComponent implements OnInit {
   constructor(private blogService: BlogService) { }
 
   ngOnInit() {
-    this.getPosts();
+    this.getPosts_mock();
   }
 
+  getPosts_mock(): void{
+    this.blogService.getPosts_mock()
+        .subscribe(posts => this.posts = posts);
+  }
   getPosts(): void{
     this.posts = this.blogService.getPosts();
   }
