@@ -12,7 +12,7 @@ export class ListComponent implements OnInit {
   constructor(private blogService: BlogService) { }
 
   ngOnInit() {
-    this.getPosts_mock();
+    this.getPosts();
   }
 
   getPosts_mock(): void{

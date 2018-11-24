@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { POSTS } from './mock-posts';
+// import * as jwt from 'jsonwebtoken';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -12,8 +13,8 @@ const httpOptions = {
 })
 export class BlogService {
 
-  private username: string;
-  private posts: Post[];
+  private username: string = "cs144";
+  private posts: Post[] = [];
   private ApiUrl = 'http://localhost:3000/api/';
 
   constructor(
@@ -24,10 +25,17 @@ export class BlogService {
 
   fetchPosts(username: string): void{
     let GetUrl = this.ApiUrl.concat(username);
-    this.http.get<Post[]>(GetUrl).subscribe((data) => {
-      this.posts.concat(data);
+    var posts: Post[] = [];
+    this.http.get<Post[]>(GetUrl).subscribe(data => {
+      this.cocantPosts(data);
     });
-    //TODO: Check 404
+  }
+
+  cocantPosts(data): void {
+    var d;
+    for(d in data){
+      this.posts.push(data[d]);
+    }
   }
 
   getPosts(): Post[]{
@@ -53,16 +61,17 @@ export class BlogService {
 
   newPost(): Post{
     var new_post = new Post();
-    new_post.postid = this.getId();
+    new_post.postid = this.getId()+1;
     new_post.created = new Date((new Date()));
     new_post.modified = new Date((new Date()));
     new_post.title = "";
     new_post.body = "";
 
     let PostUrl = this.ApiUrl.concat(this.username).concat('/').concat(new_post.postid.toString());
+    console.log(PostUrl);
 
     this.posts.push(new_post);
-    this.http.post<Post>(PostUrl, new_post, httpOptions);
+    this.http.post<Post>(PostUrl, new_post, httpOptions).subscribe();
     return new_post;
     //TODO: Check 201
   }
