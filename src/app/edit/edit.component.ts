@@ -1,7 +1,8 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { BlogService, Post} from '../blog.service';
 import { HostListener } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
+import { FormControl, FormGroup} from '@angular/forms';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 
 @Component({
   selector: 'app-edit',
@@ -10,17 +11,35 @@ import { FormControl, FormGroup, ReactiveFormsModule} from '@angular/forms';
 })
 export class EditComponent implements OnInit {
 
-  @Input() post: Post;
-  private form: FormGroup
+  private post: Post;
+  private form: FormGroup;
+  private modified: string;
 
-  constructor(private blogService: BlogService) { }
+  constructor(
+    private blogService: BlogService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute
+  ) { }
 
   ngOnInit() {
     this.form = new FormGroup({
       title: new FormControl(''),
       body: new FormControl('')
     }); 
-    // this.post = this.blogService.getPost(this.post.postid);
+    
+    this.activatedRoute.params.subscribe((params: Params) => {
+      var post = this.blogService.getPost(params['id']);
+      if(post != null) {
+        if(!this.form.pristine){
+          this.save();
+        }
+        this.post = post;
+      } 
+      else {
+        this.router.navigate(["/"]);
+      }
+    }); 
+
   }
 
   @HostListener('window:beforeunload') save() {
@@ -30,5 +49,6 @@ export class EditComponent implements OnInit {
 
   delete(){
     this.blogService.deletePost(this.post.postid);
+    this.router.navigate(['/']);
   }
 }

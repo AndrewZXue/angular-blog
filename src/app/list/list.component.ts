@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { BlogService, Post} from '../blog.service';
+import { Router, ActivatedRoute, Params } from '@angular/router';
 
 @Component({
   selector: 'app-list',
@@ -10,10 +11,13 @@ export class ListComponent implements OnInit {
 
   posts: Post[] = [];
   selectedPost: Post;
-  constructor(private blogService: BlogService) { }
+  constructor(private blogService: BlogService, private router: Router, private activatedRoute: ActivatedRoute) { }
 
   ngOnInit() {
     this.getPosts();
+    // this.activatedRoute.params.subscribe((params: Params) => { 
+    //   this.posts = this.blogService.getPosts();
+    // });
   }
 
   getPosts_mock(): void{
@@ -25,8 +29,8 @@ export class ListComponent implements OnInit {
   }
 
   newPost(): void{
-    let new_post = this.blogService.newPost();
-    let new_postid = new_post.postid;
+    var new_post = this.blogService.newPost();
+    this.router.navigate(["/edit/" + new_post.postid.toString()]);
   }
 
   onSelect(post: Post): void {

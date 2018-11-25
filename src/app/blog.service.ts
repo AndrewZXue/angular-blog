@@ -60,7 +60,7 @@ export class BlogService {
   getId(): number{
     var max_id = 0;
     for(let post of this.posts){
-      if(post.postid > max_id) max_id = post.postid + 1;
+      if(post.postid > max_id) max_id = post.postid;
     }
     return max_id;
   }
@@ -70,8 +70,8 @@ export class BlogService {
     new_post.postid = this.getId()+1;
     new_post.created = new Date((new Date()));
     new_post.modified = new Date((new Date()));
-    new_post.title = "";
-    new_post.body = "";
+    new_post.title = '';
+    new_post.body = '';
 
     let PostUrl = this.ApiUrl.concat(this.username).concat('/').concat(new_post.postid.toString());
     console.log(PostUrl);
@@ -93,8 +93,8 @@ export class BlogService {
 
   deletePost(postid: number): void {
     let DeleteUrl = this.ApiUrl.concat(this.username).concat('/').concat(postid.toString());
-    this.http.delete(DeleteUrl, httpOptions).subscribe();
     this.posts = this.posts.filter(p => p.postid !== postid);
+    this.http.delete(DeleteUrl, httpOptions).subscribe();
     //TODO: Check 204
   }
 }
