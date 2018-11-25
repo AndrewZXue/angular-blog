@@ -9,6 +9,7 @@ import { BlogService, Post} from '../blog.service';
 export class ListComponent implements OnInit {
 
   posts: Post[] = [];
+  selectedPost: Post;
   constructor(private blogService: BlogService) { }
 
   ngOnInit() {
@@ -26,5 +27,9 @@ export class ListComponent implements OnInit {
   newPost(): void{
     let new_post = this.blogService.newPost();
     let new_postid = new_post.postid;
+  }
+
+  onSelect(post: Post): void {
+    this.selectedPost = post;
   }
 }

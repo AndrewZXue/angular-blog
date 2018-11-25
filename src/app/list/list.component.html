@@ -9,11 +9,15 @@
 
   <div>
     <ul>
-      <li *ngFor="let post of posts">
-        <a routerLink="/edit/{{post.postid}}">
+      <li *ngFor="let post of posts"
+      [class.selected]="post === selectedPost"
+      (click)="onSelect(post)">
+        <!-- <a routerLink="/edit/{{post.postid}}"> -->
           <span class="badge"><i class="fa fa-clock-o" aria-hidden="true"></i> {{post.created | date:'M/d/yy, h:mm:ss a'}}</span> <span class="tit">{{post.title}}</span>
-        </a>
+        <!-- </a> -->
       </li>
     </ul>
   </div>
 </div>
+
+<app-edit [post]="selectedPost"></app-edit>

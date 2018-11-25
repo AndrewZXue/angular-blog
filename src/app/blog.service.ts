@@ -13,19 +13,25 @@ const httpOptions = {
 })
 export class BlogService {
 
-  private username: string = "cs144";
+  private username: string;
   private posts: Post[] = [];
   private ApiUrl = 'http://localhost:3000/api/';
 
   constructor(
     private http: HttpClient
   ) { 
+    this.username = this.parseJWT(document.cookie);
     this.fetchPosts(this.username);
+  }
+
+  parseJWT(token): string {
+    let base64Url = token.split('.')[1];
+    let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    return JSON.parse(atob(base64)).usr;
   }
 
   fetchPosts(username: string): void{
     let GetUrl = this.ApiUrl.concat(username);
-    var posts: Post[] = [];
     this.http.get<Post[]>(GetUrl).subscribe(data => {
       this.cocantPosts(data);
     });
@@ -76,18 +82,18 @@ export class BlogService {
     //TODO: Check 201
   }
 
-  updatePost(username: string, post: Post): void{
-    let PutUrl = this.ApiUrl.concat(username).concat('/').concat(post.postid.toString());
-    this.http.put(PutUrl, post, httpOptions);
+  updatePost(post: Post): void{
+    let PutUrl = this.ApiUrl.concat(this.username).concat('/').concat(post.postid.toString());
+    this.http.put(PutUrl, post, httpOptions).subscribe();
     this.posts.find(p=>p.postid==post.postid).title = post.title
     this.posts.find(p=>p.postid==post.postid).body = post.body
     this.posts.find(p=>p.postid==post.postid).modified = new Date((new Date()).getTime() + 24*60*60*1000);
     //TODO: Check 200
   }
 
-  deletePost(username: string, postid: number): void {
-    let DeleteUrl = this.ApiUrl.concat(username).concat('/').concat(postid.toString());
-    this.http.delete(DeleteUrl, httpOptions);
+  deletePost(postid: number): void {
+    let DeleteUrl = this.ApiUrl.concat(this.username).concat('/').concat(postid.toString());
+    this.http.delete(DeleteUrl, httpOptions).subscribe();
     this.posts = this.posts.filter(p => p.postid !== postid);
     //TODO: Check 204
   }

@@ -1,3 +1,23 @@
-<p>
-  edit works!
-</p>
+<body>
+  <div *ngIf="post">
+    <div>
+      <h3>Edit Post</h3>
+  
+      <form [formGroup]="form">
+        <div>
+				  <label for="title">Title</label> <br>
+          <input type= "text" class="form-control" formControlName="title" id="title" name = "title" [(ngModel)]="post.title" /> <br> <br>
+          <label for="body">Body</label><br>
+          <textarea class="form-control" formControlName="body" rows="15" cols="50" id="body" name = "body" [(ngModel)]="post.body"></textarea>
+          <p> Last Modified: {{post.Modified}}</p>
+				</div>
+      </form>
+    </div>
+  
+    <div>
+        <button type = "submit" (click)="delete()"> delete </button>
+        <button type = "submit" [disabled]="form.pristine" (click)="save()"> save </button>
+        <button type = "submit" (click)="preview()"> preview </button>
+    </div>
+  </div>
+</body>
