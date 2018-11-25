@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { POSTS } from './mock-posts';
+import { Observable, of, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { Router } from '@angular/router';
 // import * as jwt from 'jsonwebtoken';
 
 const httpOptions = {
@@ -18,7 +19,8 @@ export class BlogService {
   private ApiUrl = 'http://localhost:3000/api/';
 
   constructor(
-    private http: HttpClient
+    private http: HttpClient,
+    private router: Router
   ) { 
     this.username = this.parseJWT(document.cookie);
     this.fetchPosts(this.username);
@@ -48,10 +50,6 @@ export class BlogService {
     return this.posts;
   }
 
-  getPosts_mock(): Observable<Post[]>{
-    return of(POSTS);
-  }
-
   getPost(id: number): Post{
     let ret_post = this.posts.find( ret_post => ret_post.postid == id);
     return ret_post;
@@ -74,28 +72,59 @@ export class BlogService {
     new_post.body = '';
 
     let PostUrl = this.ApiUrl.concat(this.username).concat('/').concat(new_post.postid.toString());
-    console.log(PostUrl);
 
     this.posts.push(new_post);
-    this.http.post<Post>(PostUrl, new_post, httpOptions).subscribe();
+    var newPost = this.http.post<Post>(PostUrl, new_post, httpOptions).pipe(
+      catchError((err) => {
+        console.log("bp 1");
+        if (err.status != 201){
+          alert(err.status + ", Error when creating a new post"); 
+          this.router.navigate(["/"]);
+          this.posts.pop();
+        }
+        return throwError(err);  
+      })
+    );
+    newPost.subscribe();
     return new_post;
-    //TODO: Check 201
   }
 
   updatePost(post: Post): void{
+    var flag = true;
     let PutUrl = this.ApiUrl.concat(this.username).concat('/').concat(post.postid.toString());
-    this.http.put(PutUrl, post, httpOptions).subscribe();
-    this.posts.find(p=>p.postid==post.postid).title = post.title
-    this.posts.find(p=>p.postid==post.postid).body = post.body
-    this.posts.find(p=>p.postid==post.postid).modified = new Date((new Date()).getTime() + 24*60*60*1000);
-    //TODO: Check 200
+    var updatePost = this.http.put(PutUrl, post, httpOptions).pipe(
+      catchError((err) => {
+        if (err.status != 200){
+          alert(err.status + ", Error when updating a post"); 
+          this.router.navigate(["/edit/" + post.postid.toString()]);
+          flag = false;
+        }
+        return throwError(err);  
+      })
+    );
+    updatePost.subscribe();
+    if (flag){
+      this.posts.find(p=>p.postid==post.postid).title = post.title
+      this.posts.find(p=>p.postid==post.postid).body = post.body
+      this.posts.find(p=>p.postid==post.postid).modified = new Date((new Date()).getTime() + 24*60*60*1000);  
+    }
   }
 
   deletePost(postid: number): void {
     let DeleteUrl = this.ApiUrl.concat(this.username).concat('/').concat(postid.toString());
+    var tempPosts = this.posts;
+    var deletePost = this.http.delete(DeleteUrl, httpOptions).pipe(
+      catchError((err) => {
+        if (err.status != 204){
+          alert(err.status + ", Error when deleting a post"); 
+          this.router.navigate(["/"]);
+          this.posts = tempPosts; 
+        }
+        return throwError(err); 
+      })
+    );
+    deletePost.subscribe();
     this.posts = this.posts.filter(p => p.postid !== postid);
-    this.http.delete(DeleteUrl, httpOptions).subscribe();
-    //TODO: Check 204
   }
 }
 

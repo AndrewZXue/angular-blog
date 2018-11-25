@@ -13,7 +13,6 @@ export class EditComponent implements OnInit {
 
   private post: Post;
   private form: FormGroup;
-  private modified: string;
 
   constructor(
     private blogService: BlogService,

@@ -20,10 +20,6 @@ export class ListComponent implements OnInit {
     // });
   }
 
-  getPosts_mock(): void{
-    this.blogService.getPosts_mock()
-        .subscribe(posts => this.posts = posts);
-  }
   getPosts(): void{
     this.posts = this.blogService.getPosts();
   }

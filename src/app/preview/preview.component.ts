@@ -1,7 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { BlogService, Post} from '../blog.service';
-import { HostListener } from '@angular/core';
-import { FormControl, FormGroup} from '@angular/forms';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { Parser, HtmlRenderer } from 'commonmark';
 
