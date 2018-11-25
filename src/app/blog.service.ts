@@ -106,7 +106,7 @@ export class BlogService {
     if (flag){
       this.posts.find(p=>p.postid==post.postid).title = post.title
       this.posts.find(p=>p.postid==post.postid).body = post.body
-      this.posts.find(p=>p.postid==post.postid).modified = new Date((new Date()).getTime() + 24*60*60*1000);  
+      this.posts.find(p=>p.postid==post.postid).modified = new Date((new Date()).getTime());  
     }
   }
 
