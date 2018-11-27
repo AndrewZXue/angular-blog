@@ -1,4 +1,4 @@
-<div>
+<div class="list-container">
   <div>
     <h3>My Posts</h3>
 
@@ -8,9 +8,9 @@
   </div>
 
   <div>
-    <ul>
+    <ul class="posts">
       <li *ngFor="let post of posts" routerLink="/edit/{{post.postid}}">
-          <span class="badge">{{post.created | date:'M/dd/yy, h:mm:ss'}}</span> <span class="tit">{{post.title}}</span>
+          <span class="badge">{{post.created | date:'M/dd/yy, h:mm:ss'}}</span> <span class="tit">  {{post.title}}</span>
       </li>
     </ul>
   </div>

@@ -3,7 +3,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
-// import * as jwt from 'jsonwebtoken';
 
 const httpOptions = {
   headers: new HttpHeaders({ 'Content-Type': 'application/json' })
@@ -21,15 +20,20 @@ export class BlogService {
   constructor(
     private http: HttpClient,
     private router: Router
-  ) { 
-    this.username = this.parseJWT(document.cookie);
+  ) {
+    this.parseJWT();
     this.fetchPosts(this.username);
   }
 
-  parseJWT(token): string {
+  parseJWT(): void {
+    let token = document.cookie.replace(/(?:(?:^|.*;\s*)jwt\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+    if (token === null || token === '') {
+      window.location.href = 'http://localhost:3000/login?redirect=/editor';
+      return;
+    }
     let base64Url = token.split('.')[1];
     let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-    return JSON.parse(atob(base64)).usr;
+    this.username = JSON.parse(atob(base64)).usr;
   }
 
   fetchPosts(username: string): void{
@@ -63,26 +67,35 @@ export class BlogService {
     return max_id;
   }
 
-  newPost(): Post{
-    var new_post = new Post();
-    new_post.postid = this.getId()+1;
-    new_post.created = new Date((new Date()));
-    new_post.modified = new Date((new Date()));
-    new_post.title = '';
-    new_post.body = '';
+  newPost(): Post {
+    let new_post = {
+      postid: this.getId() + 1,
+      created: new Date(),
+      modified: new Date(),
+      title: "",
+      body: ""
+    };
+    // var new_post = new Post();
+    // new_post.postid = this.getId() + 1;
+    // new_post.created = new Date((new Date()));
+    // new_post.modified = new Date((new Date()));
+    // new_post.title = "";
+    // new_post.body = "";
+    const json_post = JSON.parse(JSON.stringify(new_post));
 
     let PostUrl = this.ApiUrl.concat(this.username).concat('/').concat(new_post.postid.toString());
 
     this.posts.push(new_post);
-    var newPost = this.http.post<Post>(PostUrl, new_post, httpOptions).pipe(
+    var newPost = this.http.post<Post>(PostUrl, json_post, httpOptions).pipe(
       catchError((err) => {
+        console.log(json_post);
         console.log("bp 1");
         if (err.status != 201){
-          alert(err.status + ", Error when creating a new post"); 
+          alert(err.status + ", Error when creating a new post");
           this.router.navigate(["/"]);
           this.posts.pop();
         }
-        return throwError(err);  
+        return throwError(err);
       })
     );
     newPost.subscribe();
@@ -95,18 +108,18 @@ export class BlogService {
     var updatePost = this.http.put(PutUrl, post, httpOptions).pipe(
       catchError((err) => {
         if (err.status != 200){
-          alert(err.status + ", Error when updating a post"); 
+          alert(err.status + ", Error when updating a post");
           this.router.navigate(["/edit/" + post.postid.toString()]);
           flag = false;
         }
-        return throwError(err);  
+        return throwError(err);
       })
     );
     updatePost.subscribe();
     if (flag){
-      this.posts.find(p=>p.postid==post.postid).title = post.title
-      this.posts.find(p=>p.postid==post.postid).body = post.body
-      this.posts.find(p=>p.postid==post.postid).modified = new Date((new Date()).getTime());  
+      this.posts.find(p=>p.postid==post.postid).title = post.title;
+      this.posts.find(p=>p.postid==post.postid).body = post.body;
+      this.posts.find(p=>p.postid==post.postid).modified = new Date((new Date()).getTime());
     }
   }
 
@@ -116,18 +129,27 @@ export class BlogService {
     var deletePost = this.http.delete(DeleteUrl, httpOptions).pipe(
       catchError((err) => {
         if (err.status != 204){
-          alert(err.status + ", Error when deleting a post"); 
+          alert(err.status + ", Error when deleting a post");
           this.router.navigate(["/"]);
-          this.posts = tempPosts; 
+          this.posts = tempPosts;
         }
-        return throwError(err); 
+        return throwError(err);
       })
     );
     deletePost.subscribe();
-    this.posts = this.posts.filter(p => p.postid !== postid);
+
+    let postIndex = -1;
+    for (let i in this.posts) {
+      if (this.posts[i].postid == postid) {
+        postIndex = parseInt(i);
+      }
+    }
+
+    if (postIndex != -1) {
+      this.posts.splice(postIndex, 1);
+    }
   }
 }
-
 
 export class Post {
   postid: number;

@@ -24,21 +24,19 @@ export class EditComponent implements OnInit {
     this.form = new FormGroup({
       title: new FormControl(''),
       body: new FormControl('')
-    }); 
+    });
     
     this.activatedRoute.params.subscribe((params: Params) => {
       var post = this.blogService.getPost(params['id']);
-      if(post != null) {
-        if(!this.form.pristine){
+      if (post != null) {
+        if (!this.form.pristine) {
           this.save();
         }
         this.post = post;
-      } 
-      else {
+      } else {
         this.router.navigate(["/"]);
       }
-    }); 
-
+    });
   }
 
   @HostListener('window:beforeunload') save() {

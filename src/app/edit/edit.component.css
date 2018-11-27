@@ -1,0 +1,13 @@
+:disabled {
+    color: grey;
+}
+
+#title {
+    font-size: 100%;
+}
+
+.edit-container {
+    padding-left: 10px;
+    width: 50%;
+    float: left;
+}
